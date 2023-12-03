@@ -17,9 +17,9 @@ object Ex2b extends App {
       condensedLine = condensedLine.replaceAll(",", "")
       condensedLine = condensedLine.replaceAll(" ", "")
 
-      var maxR = 0
-      var maxG = 0
-      var maxB = 0
+      var minR = 0
+      var minG = 0
+      var minB = 0
       condensedLine.split(";").foreach(item => {
         val charified = item.toCharArray
         for(i <- 0 until charified.length) {
@@ -31,16 +31,16 @@ object Ex2b extends App {
               n += 1
             }
 
-            if(charified(i+n)=='r') maxR = maxR max sum.toInt
-            else if(charified(i+n)=='g') maxG =maxG max sum.toInt
-            else if(charified(i+n)=='b') maxB =maxB max sum.toInt
+            if(charified(i+n)=='r') minR = minR max sum.toInt
+            else if(charified(i+n)=='g') minG =minG max sum.toInt
+            else if(charified(i+n)=='b') minB =minB max sum.toInt
 
           }
 
 
         }
       })
-      if(maxR <=12 && maxG<=13 && maxB<14) total += (id+1)
+      total += (minR*minG*minB)
 
     }
   }
