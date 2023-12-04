@@ -1,1 +1,4 @@
 /input/
+target/
+.bsp
+.idea
