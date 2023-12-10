@@ -1,6 +1,8 @@
 package org.eamonnh.aoc23
 
+import scala.collection.mutable
 import scala.io.Source
+import scala.language.postfixOps
 
 object Ex4b extends App {
 
@@ -8,33 +10,39 @@ object Ex4b extends App {
 
   val input = Source.fromFile(fileName).getLines.toList
 
-  var allCardsEver: List[String] = List.empty
-  var currentCards  = toCards(input)
+  val counts = mutable.Map.empty[Int, Long]
+  val initialCards = toCards(input)
 
-  while (currentCards.nonEmpty) currentCards.foreach(card => {
-    for(n <- 0 until card.points) if(input.length > card.i + n) currentCards = toCard(input(card.i + n)) :: currentCards
-    currentCards = currentCards.filterNot(c => c eq this)
+  initialCards.foreach(card => {
+    counts.update(card.i, 1)
   })
-  println(allCardsEver.length)
 
+  initialCards.foreach(card => {
+    for(i <- card.i + 1 to card.i + card.points) {
+      counts.update(i, counts(i) + counts(card.i))
+    }
+  })
+
+  println(counts.values.sum)
 
   def toCard(line: String): Card = {
-    val id = line.split(":").head.split(" ").last.toInt
-    val winningNumbers = line.split(": ").last.split(" \\| ").head.split(' ').filterNot(_.isBlank).toSet
-    val haveNumbers = line.split(": ").last.split(" \\| ").last.split(' ').filterNot(_.isBlank).toSet
+    val s"Card $id: $wins | $haves" = line
+    val winningNumbers = wins.split(" +").toSet
+    val haveNumbers = haves.split(" +").toSet
 
-    Card(id, winningNumbers, haveNumbers)
+    Card(id.trim.toInt, winningNumbers.filterNot(_.isBlank), haveNumbers.filterNot(_.isBlank))
   }
-  def toCards(value: List[String]): List[Card] = {
+  def toCards(value: List[String]): Vector[Card] = {
 
     value.map(line => {
       toCard(line)
-    })
+    }).toVector
   }
+
 
 }
 
 
 case class Card(i: Int, winners: Set[String], have: Set[String]) {
-  def points: Int = winners.intersect(have).toList.length
+  val points: Int = winners.intersect(have).size
 }
